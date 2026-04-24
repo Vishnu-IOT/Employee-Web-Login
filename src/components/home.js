@@ -56,7 +56,7 @@ export const HomeScreen = () => {
     });
 
   const formatTo12Hour = (timeStr) => {
-    if (!timeStr || timeStr === '-:--:--' || timeStr === '--:--:--')
+    if (!timeStr || timeStr === '-:--:--' || timeStr === '--:--:--'|| timeStr === '--:--')
       return '--:--:--';
 
     const date = new Date(`1970-01-01T${timeStr}`);
@@ -225,12 +225,12 @@ export const HomeScreen = () => {
               {[
                 {
                   label: 'Break-In',
-                  val: homeData?.attendance?.break_in,
+                  val: formatTo12Hour(homeData?.attendance?.break_in),
                   dot: 'dot-orange',
                 },
                 {
                   label: 'Break-Out',
-                  val: homeData?.attendance?.break_out,
+                  val: formatTo12Hour(homeData?.attendance?.break_out),
                   dot: 'dot-orange',
                 },
                 {

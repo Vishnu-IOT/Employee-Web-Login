@@ -18,6 +18,7 @@ import ApplyPermission from './components/ApplyPermission';
 import ApplyRaiseTicket from './components/ApplyRaiseTicket';
 import ApplyLeave from './components/ApplyLeave';
 import DayAttendance from './components/DayAttendance';
+import ChangePassword from './components/ChangePassword';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -78,6 +79,7 @@ function App() {
           <Route path="/apply-raiseticket" element={<ApplyRaiseTicket />} />
           <Route path="/apply-leave" element={<ApplyLeave />} />
           <Route path="/attendance-details" element={<DayAttendance />} />
+          <Route path="/change-password" element={<ChangePassword />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -990,6 +990,15 @@ body {
   border-radius: 8px;
 }
 
+.badge.absents {
+  background: var(--red);
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
 .log-times {
   display: grid;
   grid-template-columns: 1fr 1fr;

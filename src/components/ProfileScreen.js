@@ -7,8 +7,10 @@ import BottomNav from './BottomNav';
 import { fetchProfileAPI } from '../helper.js/api';
 import Lottie from 'lottie-react';
 import loading from '../lottie/loading.json';
+import { useNavigate } from 'react-router-dom';
 
 function ProfileScreen({ setUser }) {
+  const navigate = useNavigate();
   const [users, setUsers] = useState(null);
   const [loadingState, setLoadingState] = useState(false);
   const [openLogout, setOpenLogout] = useState(false);
@@ -38,7 +40,7 @@ function ProfileScreen({ setUser }) {
     { icon: <RiMessage2Fill />, text: users?.user.email },
     { icon: <FaPhoneAlt />, text: users?.user.mobile },
     { icon: <IoMdHome />, text: users?.user.address },
-    { icon: <MdWork />, text: 'MPEOPLES' },
+    { icon: <MdWork />, text: users?.user.company_name },
   ];
 
   return (
@@ -93,7 +95,7 @@ function ProfileScreen({ setUser }) {
           <div
             className="info-row"
             style={{ cursor: 'pointer' }}
-            // onClick={handleLogout}
+            onClick={() => navigate('/change-password')}
           >
             <div className="info-icon">
               <FaPhoneAlt />

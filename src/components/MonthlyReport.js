@@ -6,6 +6,7 @@ import loading from '../lottie/loading.json';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { fetchAttendanceByMonthAPI } from '../helper.js/api';
+import PdfReport from './PdfReport';
 
 function MonthlyReport() {
   const navigate = useNavigate();
@@ -115,7 +116,7 @@ function MonthlyReport() {
           <button className="down-btn" onClick={() => navigate('/home')}>
             <MdKeyboardArrowLeft />
           </button>
-          <h3 style={{ fontWeight: 600, fontSize:'16px' }}>Monthly Report</h3>
+          <h3 style={{ fontWeight: 600, fontSize: '16px' }}>Monthly Report</h3>
         </div>
         <div className="page-headers glass-panels">
           <div className="header-content">
@@ -163,7 +164,16 @@ function MonthlyReport() {
           </select>
         </div>
         <div className="form-groups">
-          <button className="excel-btn">
+          <button
+            className="excel-btn"
+            onClick={() => {
+              if (attendanceData.length > 0) {
+                PdfReport(attendanceData);
+              } else {
+                alert('No data to download');
+              }
+            }}
+          >
             <IoMdDownload />
           </button>
         </div>
@@ -198,7 +208,7 @@ function MonthlyReport() {
                     ? 'lates'
                     : log.type === 'PRESENT'
                       ? 'presents'
-                      : 'absent'
+                      : 'absents'
                 }`}
               >
                 {log.late_checkin ? `Late ${log.late_checkin_time}` : log.type}
@@ -248,7 +258,7 @@ function MonthlyReport() {
                       ? 'lates'
                       : log.type === 'PRESENT'
                         ? 'presents'
-                        : 'absent'
+                        : 'absents'
                   }`}
                 >
                   {log.late_checkin

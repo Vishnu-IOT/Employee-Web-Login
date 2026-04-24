@@ -37,6 +37,15 @@ async function forgetPasswordAPI(email) {
   }
 }
 
+async function changePasswordAPI(data) {
+  try {
+    const response = await axios.post(`${BASE_URL}/change-Password`, data);
+    return response.data;
+  } catch (err) {
+    alert(err);
+  }
+}
+
 async function fetchHomePageAPI() {
   try {
     const token = localStorage.getItem('token');
@@ -315,10 +324,10 @@ async function fetchLateDaysAPI(filter) {
   }
 }
 
-async function fetchLiveLocationAddrAPI(lati, loni) {
+async function fetchLiveLocationAddrAPI(data) {
   try {
-    const lat = lati;
-    const lon = loni;
+    const lat = data.checkin_lat;
+    const lon = data.checkin_lon;
 
     if (!lat || !lon) return null;
 
@@ -346,6 +355,7 @@ async function fetchLiveLocationAddrAPI(lati, loni) {
 export {
   loginAPI,
   forgetPasswordAPI,
+  changePasswordAPI,
   fetchHomePageAPI,
   fetchProfileAPI,
   fetchAttendanceWMAPI,

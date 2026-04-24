@@ -297,14 +297,26 @@ export const OverviewScreen = () => {
 
         setCheckData(updatedData);
 
-        // ✅ NOW call API properly
-        const data = await fetchLiveLocationAddrAPI(latitude, longitude);
+        setLiveLocation('Fetching location...');
 
-        // ✅ correct field from nominatim
-        setLiveLocation(data?.display_name || 'Location not found');
+        try {
+          const data = await fetchLiveLocationAddrAPI({
+            checkin_lat: latitude,
+            checkin_lon: longitude,
+          });
+
+          setLiveLocation(data?.display_name || 'Location not found');
+        } catch (e) {
+          setLiveLocation('Location unavailable');
+        }
       },
       (err) => {
         alert('Location permission required');
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000, // ⬅️ important
+        maximumAge: 0,
       }
     );
   };
@@ -471,7 +483,7 @@ export const OverviewScreen = () => {
 
                 <div className="dialog-row">
                   <span className="icon">📍</span>
-                  <span>{liveLocation ? liveLocation : 'loading..'}</span>
+                  <span>{liveLocation ? liveLocation : 'Fetching Location...'}</span>
                 </div>
               </div>
 
@@ -487,15 +499,13 @@ export const OverviewScreen = () => {
                   }
                 }}
               >
-                {liveLocation
-                  ? actionType === 'checkin'
-                    ? 'Submit Check-In'
-                    : actionType === 'break'
-                      ? onBreak
-                        ? 'Back to Work'
-                        : 'Take Break'
-                      : 'Submit Check-Out'
-                  : 'Loading...'}
+                {actionType === 'checkin'
+                  ? 'Submit Check-In'
+                  : actionType === 'break'
+                    ? onBreak
+                      ? 'Back to Work'
+                      : 'Take Break'
+                    : 'Submit Check-Out'}
               </button>
             </div>
           </div>
@@ -548,7 +558,7 @@ export const OverviewScreen = () => {
                       ? 'lates'
                       : log.type === 'PRESENT'
                         ? 'presents'
-                        : 'absent'
+                        : 'absents'
                   }`}
                 >
                   {log.late_checkin
@@ -602,7 +612,7 @@ export const OverviewScreen = () => {
                       ? 'lates'
                       : log.type === 'PRESENT'
                         ? 'presents'
-                        : 'absent'
+                        : 'absents'
                   }`}
                 >
                   {log.late_checkin
