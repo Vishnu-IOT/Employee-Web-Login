@@ -4,7 +4,9 @@ import BottomNav from './BottomNav';
 import {
   fetchAttendanceWMAPI,
   fetchHomePageAPI,
+  fetchLiveLocationAddrAPI,
   storeMarkAttendanceAPI,
+  storeTakeBreakAPI,
 } from '../helper.js/api';
 import Lottie from 'lottie-react';
 import loading from '../lottie/loading.json';
@@ -21,6 +23,12 @@ export const OverviewScreen = () => {
   const [loadingState, setLoadingState] = useState(false);
   const navigate = useNavigate();
 
+  const [capturedImage, setCapturedImage] = useState(null);
+  const [onBreak, setOnBreak] = useState(false);
+  const [breakUsed, setBreakUsed] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [liveLocation, setLiveLocation] = useState(false);
+
   const [actionType, setActionType] = useState('');
   const [actionTime, setActionTime] = useState(null);
   const [checkData, setCheckData] = useState({
@@ -34,6 +42,7 @@ export const OverviewScreen = () => {
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleAttendance = async (capturedBlob) => {
+    setSubmitting(true);
     const formData = new FormData();
 
     Object.keys(checkData).forEach((key) => {
@@ -70,6 +79,32 @@ export const OverviewScreen = () => {
     } catch (error) {
       console.error(error);
       alert('Error submitting form');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleBreak = async () => {
+    setSubmitting(true);
+    try {
+      await storeTakeBreakAPI(checkData);
+      setOpenDialog(false);
+      setCheckData({
+        type: '',
+        checkin_lat: '',
+        checkin_lon: '',
+        checkout_lat: '',
+        checkout_lon: '',
+      });
+      setOnBreak((prev) => !prev);
+      if (checkData.type === 'breakout') {
+        setBreakUsed(true); // ✅ mark break completed
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Error submitting form');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -77,27 +112,11 @@ export const OverviewScreen = () => {
   const [cameraOpen, setCameraOpen] = useState(false);
   const webcamRef = useRef(null);
 
-  // const startCamera = async () => {
-  //   try {
-  //     const stream = await navigator.mediaDevices.getUserMedia({
-  //       video: {
-  //         facingMode: { ideal: 'user' }, // 👈 better than "user"
-  //       },
-  //       audio: false,
-  //     });
-
-  //     if (videoRef.current) {
-  //       videoRef.current.srcObject = stream;
-  //       await videoRef.current.play();
-  //     }
-
-  //     setCameraOpen(true);
-  //   } catch (err) {
-  //     console.error('Camera error:', err);
-  //   }
-  // };
-
   const stopCamera = () => {
+    const stream = webcamRef.current?.video?.srcObject;
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+    }
     setCameraOpen(false);
   };
 
@@ -124,12 +143,20 @@ export const OverviewScreen = () => {
       return;
     }
 
-    const blob = dataURLtoBlob(imageSrc);
+    setCapturedImage(imageSrc); // ✅ store preview
+    setOpenDialog(false);
+    stopCamera(); // close camera
+  };
 
-    stopCamera();
+  const handleConfirm = () => {
+    const blob = dataURLtoBlob(capturedImage);
+    handleAttendance(blob); // ✅ now call API
+    setCapturedImage(null);
+  };
 
-    // ✅ directly send blob
-    handleAttendance(blob);
+  const handleRetake = () => {
+    setCapturedImage(null);
+    setTimeout(() => setCameraOpen(true), 200);
   };
 
   const reversedData = [...attendanceData].reverse();
@@ -144,6 +171,19 @@ export const OverviewScreen = () => {
         setAttendanceData(
           Array.isArray(data?.attendance) ? data.attendance : []
         );
+
+        if (
+          data2?.attendance?.break_in !== '--:--' &&
+          data2?.attendance?.break_out !== '--:--'
+        ) {
+          setBreakUsed(true);
+        }
+
+        if (data2?.attendance?.break_in !== '--:--') {
+          setOnBreak(true);
+        } else {
+          setOnBreak(false);
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -223,39 +263,50 @@ export const OverviewScreen = () => {
     const now = new Date();
     setActionTime(now);
     setActionType(type);
+    setOpenDialog(true);
 
-    navigator.geolocation.getCurrentPosition((pos) => {
-      const { latitude, longitude } = pos.coords;
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
 
-      let updatedData = { ...checkData };
+        let updatedData = { ...checkData };
 
-      if (type === 'checkin') {
-        updatedData = {
-          ...updatedData,
-          type: 'checkin',
-          checkin_lat: latitude,
-          checkin_lon: longitude,
-        };
+        if (type === 'checkin') {
+          updatedData = {
+            ...updatedData,
+            type: 'checkin',
+            checkin_lat: latitude,
+            checkin_lon: longitude,
+          };
+        }
+
+        if (type === 'checkout') {
+          updatedData = {
+            ...updatedData,
+            type: 'checkout',
+            checkout_lat: latitude,
+            checkout_lon: longitude,
+          };
+        }
+        if (type === 'break') {
+          updatedData = {
+            ...updatedData,
+            type: onBreak ? 'breakout' : 'breakin', // 👈 toggle
+          };
+        }
+
+        setCheckData(updatedData);
+
+        // ✅ NOW call API properly
+        const data = await fetchLiveLocationAddrAPI(latitude, longitude);
+
+        // ✅ correct field from nominatim
+        setLiveLocation(data?.display_name || 'Location not found');
+      },
+      (err) => {
+        alert('Location permission required');
       }
-
-      if (type === 'checkout') {
-        updatedData = {
-          ...updatedData,
-          type: 'checkout',
-          checkout_lat: latitude,
-          checkout_lon: longitude,
-        };
-      }
-      if (type === 'break') {
-        updatedData = {
-          ...updatedData,
-          type: 'break',
-        };
-      }
-
-      setCheckData(updatedData);
-      setOpenDialog(true);
-    });
+    );
   };
 
   return (
@@ -325,12 +376,15 @@ export const OverviewScreen = () => {
               </button>
             ) : isCheckedIn && !isCheckedOut ? (
               <div className="checkin-actions">
-                <button
-                  className="break-btn"
-                  onClick={() => handleAction('break')}
-                >
-                  Take Break
-                </button>
+                {!breakUsed && (
+                  <button
+                    className={`break-btn ${onBreak ? 'danger-btn' : ''}`}
+                    onClick={() => handleAction('break')}
+                  >
+                    {onBreak ? 'Back to Work' : 'Take Break'}
+                  </button>
+                )}
+
                 <button
                   className="checkin-btn"
                   onClick={() => handleAction('checkout')}
@@ -372,6 +426,22 @@ export const OverviewScreen = () => {
           </div>
         )}
 
+        {capturedImage && (
+          <div className="preview-overlay">
+            <img src={capturedImage} alt="preview" className="preview-img" />
+
+            <div className="preview-controls">
+              <button onClick={handleRetake} className="submit-btn">
+                🔄 Retake
+              </button>
+
+              <button onClick={handleConfirm} className="submit-btn">
+                ✅ Submit
+              </button>
+            </div>
+          </div>
+        )}
+
         <canvas ref={canvasRef} style={{ display: 'none' }} />
 
         {/* Check In Overview */}
@@ -382,7 +452,9 @@ export const OverviewScreen = () => {
                 {actionType === 'checkin'
                   ? 'Ready to start your day? 🚀'
                   : actionType === 'break'
-                    ? 'Break time! Relax a bit ☕'
+                    ? onBreak
+                      ? 'Back to Productivity 🕒'
+                      : 'Break time! Relax a bit ☕'
                     : 'Time to relax, see you tomorrow 😊'}
               </h2>
 
@@ -399,19 +471,31 @@ export const OverviewScreen = () => {
 
                 <div className="dialog-row">
                   <span className="icon">📍</span>
-                  <span>54, Salem, Tamil Nadu, India</span>
+                  <span>{liveLocation ? liveLocation : 'loading..'}</span>
                 </div>
               </div>
 
               <button
                 className="submit-btn"
-                onClick={() => setCameraOpen(true)}
+                disabled={submitting}
+                onClick={() => {
+                  if (actionType === 'checkin' || actionType === 'checkout') {
+                    setCameraOpen(true); // ✅ only for selfie actions
+                  } else {
+                    handleBreak(); // ✅ directly call API for break
+                    setOpenDialog(false);
+                  }
+                }}
               >
-                {actionType === 'checkin'
-                  ? 'Submit Check-In'
-                  : actionType === 'break'
-                    ? 'Submit Break'
-                    : 'Submit Check-Out'}
+                {liveLocation
+                  ? actionType === 'checkin'
+                    ? 'Submit Check-In'
+                    : actionType === 'break'
+                      ? onBreak
+                        ? 'Back to Work'
+                        : 'Take Break'
+                      : 'Submit Check-Out'
+                  : 'Loading...'}
               </button>
             </div>
           </div>
@@ -444,6 +528,7 @@ export const OverviewScreen = () => {
             </button>
           </div>
         </div>
+
         {/* Log Items */}
         <div style={{ display: 'flex', gap: '10px', flexDirection: 'column' }}>
           {reversedData?.map((log, i) => (
@@ -529,8 +614,14 @@ export const OverviewScreen = () => {
           ))}
         </div>
       </div>
-      {/* Bottom nav — hidden on desktop via CSS */}
-      <BottomNav />
+      <div
+        style={{
+          display: capturedImage ? 'none' : 'flex',
+        }}
+      >
+        {/* Bottom nav — hidden on desktop via CSS */}
+        <BottomNav />
+      </div>
     </>
   );
 };

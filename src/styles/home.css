@@ -647,6 +647,14 @@ body {
   transition: background 0.2s;
   font-family: var(--font-main);
 }
+.danger-btn {
+  background: #ff4d4f; /* red */
+  color: white;
+}
+
+.danger-btn:hover {
+  background: #d9363e;
+}
 
 /* ATTENDANCE STATUS */
 .attendance-status-card {
@@ -1723,6 +1731,10 @@ body {
     display: flex !important;
     flex-direction: column;
   }
+  .preview-controls{
+    width: 100% !important;
+    padding: 16px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -2067,4 +2079,41 @@ body {
 .holi-desc {
   font-size: 14px;
   color: #333;
+}
+
+.preview-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.preview-img {
+  width: 90%;
+  max-width: 400px;
+  border-radius: 10px;
+}
+
+.preview-controls {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  gap: 20px;
+}
+
+.retake-btn,
+.confirm-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
 }

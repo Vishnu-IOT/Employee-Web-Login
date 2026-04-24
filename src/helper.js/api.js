@@ -131,6 +131,23 @@ async function storeMarkAttendanceAPI(data) {
   }
 }
 
+async function storeTakeBreakAPI(data) {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await axios.post(`${BASE_URL}/mark-lunch-time`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    alert(err.response?.data?.message || 'Something went wrong');
+  }
+}
+
 async function fetchPermisionAPI() {
   try {
     const token = localStorage.getItem('token');
@@ -298,6 +315,34 @@ async function fetchLateDaysAPI(filter) {
   }
 }
 
+async function fetchLiveLocationAddrAPI(lati, loni) {
+  try {
+    const lat = lati;
+    const lon = loni;
+
+    if (!lat || !lon) return null;
+
+    const response = await axios.get(
+      'https://nominatim.openstreetmap.org/reverse',
+      {
+        params: {
+          format: 'json',
+          lat,
+          lon,
+        },
+        headers: {
+          'Accept-Language': 'en',
+        },
+      }
+    );
+
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
 export {
   loginAPI,
   forgetPasswordAPI,
@@ -306,6 +351,7 @@ export {
   fetchAttendanceWMAPI,
   fetchAttendanceByMonthAPI,
   storeMarkAttendanceAPI,
+  storeTakeBreakAPI,
   fetchPermisionAPI,
   applyPermissionAPI,
   fetchLeaveAPI,
@@ -315,4 +361,5 @@ export {
   fetchOnDayAttendanceAPI,
   fetchHolidaysAPI,
   fetchLateDaysAPI,
+  fetchLiveLocationAddrAPI,
 };

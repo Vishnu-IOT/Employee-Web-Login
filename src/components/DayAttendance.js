@@ -37,30 +37,44 @@ function DayAttendance() {
     home();
   }, [attendance]);
 
+  const formatTo12Hour = (timeStr) => {
+    if (!timeStr || timeStr === '-:--:--' || timeStr === '--:--:--')
+      return '--:--:--';
+
+    const date = new Date(`1970-01-01T${timeStr}`);
+
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit', // ✅ include seconds
+      hour12: true,
+    });
+  };
+
   const data = [
     {
       icon: <FiLogIn />,
-      value: dayData?.attendance.check_in.time,
+      value: formatTo12Hour(dayData?.attendance.check_in.time),
       label: 'Check In',
       bg: 'green',
       onClick: () => setPreviewImg(dayData?.attendance?.selfimgin),
     },
     {
       icon: <FiLogOut />,
-      value: dayData?.attendance.check_out.time,
+      value: formatTo12Hour(dayData?.attendance.check_out.time),
       label: 'Check Out',
       bg: 'var(--red)',
       onClick: () => setPreviewImg(dayData?.attendance?.selfimgout),
     },
     {
       icon: <FaBurger />,
-      value: dayData?.attendance.break_in,
+      value: formatTo12Hour(dayData?.attendance.break_in),
       label: 'Break-In',
       bg: 'orange',
     },
     {
       icon: <FaBurger />,
-      value: dayData?.attendance.break_out,
+      value: formatTo12Hour(dayData?.attendance.break_out),
       label: 'Break-Out',
       bg: '#8A1F0A',
     },
@@ -148,7 +162,7 @@ function DayAttendance() {
             onClick={item.onClick}
             style={{ cursor: item.onClick ? 'pointer' : 'default' }}
           >
-            <div className="icon" style={{ color: item.bg }}>
+            <div className="icons" style={{ color: item.bg }}>
               {item.icon}
             </div>
             <div className="value">{item.value}</div>
@@ -167,7 +181,9 @@ function DayAttendance() {
           <button className="down-btn" onClick={() => navigate('/attendance')}>
             <MdKeyboardArrowLeft />
           </button>
-          <h3 style={{ fontWeight: 600, fontSize:'16px' }}>Attendance Details</h3>
+          <h3 style={{ fontWeight: 600, fontSize: '16px' }}>
+            Attendance Details
+          </h3>
         </div>
       </div>
 
