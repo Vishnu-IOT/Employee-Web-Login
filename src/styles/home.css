@@ -46,6 +46,13 @@ body {
   color: var(--text-dark);
 }
 
+input,
+select,
+textarea {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
 /* ===== APP SHELL ===== */
 .app-shell {
   display: flex;
@@ -1740,7 +1747,7 @@ body {
     display: flex !important;
     flex-direction: column;
   }
-  .preview-controls{
+  .preview-controls {
     width: 100% !important;
     padding: 16px;
   }
