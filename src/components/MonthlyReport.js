@@ -1,7 +1,7 @@
 import Lottie from 'lottie-react';
 import React, { useEffect, useState } from 'react';
 import { IoMdDownload } from 'react-icons/io';
-import animationData from '../lottie/Online Work.json';
+import animationData from '../lottie/Completing Tasks.json';
 import loading from '../lottie/loading.json';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
-import animationData from '../lottie/Online Work.json';
+import animationData from '../lottie/Holiday.json';
 import loading from '../lottie/loading.json';
 import Lottie from 'lottie-react';
 import { useNavigate } from 'react-router-dom';

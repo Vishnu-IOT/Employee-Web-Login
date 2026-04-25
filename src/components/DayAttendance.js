@@ -38,7 +38,7 @@ function DayAttendance() {
   }, [attendance]);
 
   const formatTo12Hour = (timeStr) => {
-    if (!timeStr || timeStr === '-:--:--' || timeStr === '--:--:--')
+    if (!timeStr || timeStr === '-:--:--' || timeStr === '--:--:--'|| timeStr === '--:--')
       return '--:--:--';
 
     const date = new Date(`1970-01-01T${timeStr}`);
