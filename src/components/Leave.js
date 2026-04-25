@@ -217,7 +217,7 @@ function Leave() {
                   style={{ width: 120, height: 120 }}
                 />
                 <div>
-                  <p>No Permission Found</p>
+                  <p>No Leave Found</p>
                 </div>
               </div>
             )}
