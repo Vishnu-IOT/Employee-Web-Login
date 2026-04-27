@@ -1,6 +1,10 @@
 {
   "short_name": "MyKonnect",
   "name": "MyKonnect",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#1a56db",
   "icons": [
     {
       "src": "/favicon-32x32.png",
@@ -17,9 +21,5 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "start_url": "/",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  ]
 }
