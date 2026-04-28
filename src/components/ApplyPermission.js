@@ -57,7 +57,7 @@ function ApplyPermission() {
     try {
       const response = await applyPermissionAPI(submitData);
 
-      if (response.ok) {
+      if (response.success) {
         alert(response.message || 'Permission Created successfully!');
         navigate('/permission');
       } else {

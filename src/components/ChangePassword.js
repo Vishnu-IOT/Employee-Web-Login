@@ -40,7 +40,7 @@ function ChangePassword() {
     try {
       const response = await changePasswordAPI(submitData);
 
-      if (response.ok) {
+      if (response.success) {
         alert(response.message || 'Password Changed successfully!');
         setChangePassword({
           old_password: '',

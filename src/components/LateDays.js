@@ -183,7 +183,7 @@ function LateDays() {
                   style={{ width: 120, height: 120 }}
                 />
                 <div>
-                  <p>No Permission Found</p>
+                  <p>No Late Days Found</p>
                 </div>
               </div>
             )}

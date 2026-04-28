@@ -38,7 +38,7 @@ function ApplyLeave() {
     try {
       const response = await applyLeaveAPI(submitData);
 
-      if (response.ok) {
+      if (response.success) {
         alert(response.message || 'Leave Created successfully!');
         setLeave({
           leave_date: '',

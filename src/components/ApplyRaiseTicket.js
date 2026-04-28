@@ -41,7 +41,7 @@ function ApplyRaiseTicket() {
     try {
       const response = await raiseTicketAPI(submitData);
 
-      if (response.ok) {
+      if (response.success) {
         alert(response.message || 'Ticket Created successfully!');
         navigate('/ticket');
       } else {

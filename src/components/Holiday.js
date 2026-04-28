@@ -177,7 +177,7 @@ function Holiday() {
                   style={{ width: 120, height: 120 }}
                 />
                 <div>
-                  <p>No Permission Found</p>
+                  <p>No Holiday Found</p>
                 </div>
               </div>
             )}
