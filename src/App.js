@@ -19,21 +19,42 @@ import ApplyRaiseTicket from './components/ApplyRaiseTicket';
 import ApplyLeave from './components/ApplyLeave';
 import DayAttendance from './components/DayAttendance';
 import ChangePassword from './components/ChangePassword';
+import { checkTokenExpiresAPI } from './helper.js/api';
 
 function App() {
   const [user, setUser] = useState(null);
-
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const validateUser = async () => {
+      const storedUser = localStorage.getItem('user');
 
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+      if (!storedUser) {
+        setLoading(false);
+        return;
+      }
 
-    setLoading(false); // ✅ important
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        const res = await checkTokenExpiresAPI();
+        if (res.status) {
+          setUser(parsedUser);
+        } else {
+          localStorage.removeItem('user');
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Token validation failed:', error);
+        localStorage.removeItem('user');
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    validateUser();
   }, []);
+
   const PrivateRoute = ({ children }) => {
     if (loading) return null;
     return user ? children : <Navigate to="/login" />;

@@ -46,6 +46,24 @@ async function changePasswordAPI(data) {
   }
 }
 
+async function checkTokenExpiresAPI() {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await axios.get(`${BASE_URL}/check-token`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    alert(err.response?.data?.message || 'Something went wrong');
+  }
+}
+
 async function fetchHomePageAPI() {
   try {
     const token = localStorage.getItem('token');
@@ -356,6 +374,7 @@ export {
   loginAPI,
   forgetPasswordAPI,
   changePasswordAPI,
+  checkTokenExpiresAPI,
   fetchHomePageAPI,
   fetchProfileAPI,
   fetchAttendanceWMAPI,
